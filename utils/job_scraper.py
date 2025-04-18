@@ -1,3 +1,4 @@
+
 import requests
 from bs4 import BeautifulSoup
 import time
@@ -6,11 +7,14 @@ import re
 from datetime import datetime, timedelta
 
 class JobScraper:
-    """ job scraper class for multiple platforms"""
+    """Job scraper for multiple platforms."""
+    
     def __init__(self):
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
         }
+        
+        # Initialize platform-specific settings
         self.platforms = {
             "LinkedIn": {
                 "search_url": "https://www.linkedin.com/jobs/search",
@@ -35,13 +39,15 @@ class JobScraper:
         }
     
     def verify_url(self, url):
+        """Verify that a URL is valid and reachable."""
         try:
-            response = requests.get(url, timeout=5)
+            response = requests.head(url, timeout=5)
             return response.status_code < 400
         except:
             return False
-        
-    def search_jobs(self, keywords, location, platform ="LinkedIn", count = 5):
+    
+    def search_jobs(self, keywords, location, platform="Indeed", count=5):
+        """Search for jobs across selected platforms."""
         if platform == "LinkedIn":
             return self.search_linkedin(keywords, location, count)
         elif platform == "Indeed":
@@ -53,9 +59,9 @@ class JobScraper:
         elif platform == "Monster":
             return self.search_monster(keywords, location, count)
         else:
-            print("Invalid platform {platform}")
+            print(f"Platform {platform} not supported.")
             return []
-        
+    
     def search_indeed(self, keywords, location, count=5):
         """Search for jobs on Indeed with working URLs."""
         try:
@@ -93,29 +99,28 @@ class JobScraper:
             
         except Exception as e:
             print(f"Indeed search error: {e}")
-            return []         
-            
-            
+            return []
+    
     def search_linkedin(self, keywords, location, count=5):
         """Search for jobs on LinkedIn with working URLs."""
         try:
-            # Format search parameters correctly for LinkedIn
+            # Format for LinkedIn search
             keyword_param = keywords.replace(" ", "%20")
             location_param = location.replace(" ", "%20")
             
-            # Create search URL
-            search_url = f"https://www.linkedin.com/jobs/search/?keywords={keyword_param}&location={location_param}"
+            # LinkedIn job search URL
+            search_url = f"https://www.linkedin.com/jobs/search/?keywords={keyword_param}&location={location_param}&sortBy=DD"
             
             # Verify the search URL is valid
             if not self.verify_url(search_url):
-                search_url = "https://www.linkedin.com/"
+                search_url = "https://www.linkedin.com/jobs/"
             
             # Create fallback job listings
             jobs = []
             for i in range(min(count, 5)):
                 # Generate realistic fake job listings
-                company_names = ["Acme Tech", "GlobalSystems", "InnoTech Solutions", "Digital Ventures", "TechCorp"]
-                job_types = ["Full-time", "Contract", "Part-time", "Permanent", "Remote"]
+                company_names = ["Microsoft", "Amazon", "Google", "Apple", "Meta"]
+                job_types = ["Full-time", "Contract", "Permanent", "Remote", "Hybrid"]
                 
                 jobs.append({
                     "title": f"{keywords} {['Specialist', 'Engineer', 'Manager', 'Director', 'Lead'][i % 5]}",
@@ -128,10 +133,13 @@ class JobScraper:
                     "platform": "LinkedIn",
                     "is_real_job": False
                 })
-                return jobs
+            
+            return jobs
+            
         except Exception as e:
             print(f"LinkedIn search error: {e}")
             return []
+    
     def search_glassdoor(self, keywords, location, count=5):
         """Search for jobs on Glassdoor with working URLs."""
         try:
