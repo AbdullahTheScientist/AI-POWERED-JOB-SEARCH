@@ -29,15 +29,12 @@ st.set_page_config(
 def load_resources():
     """Load and cache all required resources."""
     from utils.serp_api_searcher import SerpApiSearcher
-    from agents.resume_agent import ResumeAgent
     from agents.job_search_agent import JobSearchAgent
     
-    resume_agent = ResumeAgent()
     job_search_agent = JobSearchAgent()
     serp_api_searcher = SerpApiSearcher()
     
     return {
-        "resume_agent": resume_agent,
         "job_search_agent": job_search_agent,
         "serp_api_searcher": serp_api_searcher,
     }
@@ -203,8 +200,8 @@ with tabs[0]:
                             jobs = job_search_agent.search_jobs(
                                 # st.session_state.resume_data,
                                 search_query,
-                                location,
-                                platforms=selected_platforms,
+                                location=location,
+                                platform=selected_platforms,
                                 count=job_count
                             )
                         except Exception as e:
@@ -255,7 +252,10 @@ with tabs[0]:
         
         # Sort jobs based on selection
         sorted_jobs = filtered_jobs.copy()
-        print(sorted_jobs)
+        # print(type(sorted_jobs))
+        # for job in sorted_jobs:
+        #     sorted_jobs = job['jobs_results']
+        # print(sorted_jobs)
         if sort_option == "Most Recent":
             # Try to parse dates for sorting
             for job in sorted_jobs:
@@ -285,7 +285,7 @@ with tabs[0]:
             sorted_jobs.sort(key=lambda x: x.get("company", "").lower())
         elif sort_option == "Location":
             sorted_jobs.sort(key=lambda x: x.get("location", "").lower())
-        
+         
         if not sorted_jobs:
             st.warning(f"No jobs found for the selected platform: {filter_platform}")
         else:

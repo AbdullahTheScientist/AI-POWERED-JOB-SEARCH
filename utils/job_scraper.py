@@ -25,7 +25,7 @@ class JobScraper:
                 "base_url": "https://www.indeed.com"
             },
             "Glassdoor": {
-                "search_url": "https://www.glassdoor.com/Job/jobs.htm",
+                "search_url": "https://www.glassdoor.com/Job/jobs.html",
                 "base_url": "https://www.glassdoor.com"
             },
             "ZipRecruiter": {
